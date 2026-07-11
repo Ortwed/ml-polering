@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kundens prisberegning — ML Polering</title>
+<meta name="description" content="Visuel oversigt over en kundes prisberegning fra mlpolering.dk.">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/png" href="logo-mark.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1B3A56; --ink-soft:#42607A; --muted:#6E8190;
+    --blue:#2C79AE; --blue-deep:#1F5E88;
+    --pane:#9CC0DA; --pane-soft:#C9DEEC;
+    --cream:#F5F1E8; --cream-2:#EFE8DB;
+    --line:#E4DCCC; --line-cool:#D8E3EB; --white:#FFFFFF;
+    --radius:18px;
+    --shadow:0 24px 60px -28px rgba(27,58,86,.4);
+    --shadow-sm:0 6px 20px -12px rgba(27,58,86,.45);
+    --mark:url("logo-mark.png");
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:"Hanken Grotesk",system-ui,sans-serif;color:var(--ink);background:var(--cream);line-height:1.55;-webkit-font-smoothing:antialiased}
+  h1,h2,h3{font-family:"Bricolage Grotesque",system-ui,sans-serif;line-height:1.05;letter-spacing:-.02em;font-weight:700}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+  .eyebrow{font-size:.72rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--blue);display:inline-flex;align-items:center;gap:.5rem}
+  .eyebrow::before{content:"";width:22px;height:2px;background:var(--blue);border-radius:2px}
+  a{color:inherit}
+
+  header.nav{position:sticky;top:0;z-index:50;background:rgba(245,241,232,.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+  .nav-inner{display:flex;align-items:center;justify-content:space-between;height:68px}
+  .brand{display:flex;align-items:center;gap:.6rem;font-family:"Bricolage Grotesque";font-weight:800;font-size:1.15rem;letter-spacing:.01em}
+  .brand .mark{width:34px;height:34px;flex:0 0 34px;background:var(--mark) center/contain no-repeat;display:block}
+  .nav-links{display:flex;align-items:center;gap:1.6rem}
+  .nav-links a.txt{font-weight:500;font-size:.95rem;color:var(--ink-soft);text-decoration:none}
+  .nav-links a.txt:hover{color:var(--ink)}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;font-family:"Hanken Grotesk";font-weight:600;font-size:.95rem;padding:.7rem 1.2rem;border-radius:999px;border:1px solid transparent;cursor:pointer;text-decoration:none;transition:transform .15s ease,box-shadow .15s ease,background .15s ease}
+  .btn-call{background:var(--ink);color:var(--white)}
+  .btn-call:hover{transform:translateY(-1px);box-shadow:var(--shadow-sm)}
+  .btn-primary{background:var(--ink);color:var(--white);box-shadow:0 8px 22px -12px rgba(27,58,86,.7)}
+  .btn-primary:hover{transform:translateY(-1px);background:#234a6c}
+  .btn-ghost{background:transparent;border-color:var(--ink);color:var(--ink)}
+  .btn-ghost:hover{background:var(--ink);color:#fff}
+  @media(max-width:760px){.nav-links a.txt{display:none}}
+
+  .hero{position:relative;overflow:hidden;background:radial-gradient(120% 90% at 88% -10%, rgba(156,192,218,.28), transparent 58%),linear-gradient(180deg,#F5F1E8 0%,#FBF9F4 100%)}
+  .hero-inner{display:flex;flex-direction:column;align-items:center;text-align:center;padding:60px 0 74px}
+  .hero h1{font-size:clamp(2.5rem,5.6vw,4.1rem);font-weight:800;margin-top:1.1rem}
+  .hero h1 .hl{color:var(--blue-deep)}
+  .hero p.lead{margin:1.3rem auto 0;font-size:1.18rem;color:var(--ink-soft);max-width:48ch}
+  .hero-cta{margin-top:2rem;display:flex;gap:.8rem;flex-wrap:wrap;justify-content:center}
+  .hero-mini{margin-top:1.8rem;display:flex;gap:.7rem;flex-wrap:wrap;justify-content:center}
+  .hero-mini span{display:inline-flex;align-items:center;gap:.45rem;font-size:.9rem;font-weight:600;color:var(--ink-soft);background:rgba(255,255,255,.6);border:1px solid var(--line-cool);border-radius:999px;padding:7px 14px}
+  .hero-mini svg{width:15px;height:15px;color:var(--blue)}
+  .hero-art{max-width:300px;margin:0 auto}
+  .hero-art img.art{width:100%;height:auto;display:block;filter:drop-shadow(0 18px 36px rgba(27,58,86,.16))}
+  @media(max-width:880px){.hero-inner{padding:44px 0 54px}.hero-art{max-width:230px}}
+
+  section.block{padding:84px 0}
+  .sec-head{max-width:62ch;margin:0 auto 36px;text-align:center}
+  .sec-head h2{font-size:clamp(1.8rem,3.4vw,2.6rem);margin-top:.8rem}
+  .sec-head p{margin-top:.8rem;color:var(--ink-soft);font-size:1.06rem}
+
+  #beregner{background:linear-gradient(180deg,#FBF9F4 0%,#F5F1E8 100%);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .calc{display:grid;grid-template-columns:1.32fr .78fr;gap:28px;align-items:start}
+  @media(max-width:920px){.calc{grid-template-columns:1fr}}
+  .panel{background:var(--white);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow-sm)}
+  .panel-pad{padding:24px 24px 10px}
+  .step-label{font-size:1.05rem;font-weight:700;letter-spacing:0;text-transform:none;color:var(--ink);display:flex;align-items:center;justify-content:center;gap:.7rem;margin:28px 0 16px}
+  .step-label .n{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--blue);color:#fff;font-family:"JetBrains Mono";font-size:1.05rem;font-weight:700;box-shadow:0 6px 14px -6px rgba(44,121,174,.7)}
+  .panel-pad > .step-label:first-child{margin-top:4px}
+
+  .addr-wrap{position:relative}
+  .addr-input{width:100%;padding:13px 15px;border:1px solid var(--line);border-radius:12px;background:var(--cream);font-family:inherit;font-size:1rem;color:var(--ink)}
+  .addr-input:focus{outline:none;border-color:var(--blue);background:#fff;box-shadow:0 0 0 3px rgba(44,121,174,.16)}
+  .addr-suggest{position:absolute;left:0;right:0;top:calc(100% + 5px);background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow-sm);z-index:30;overflow:hidden}
+  .addr-suggest:empty{display:none}
+  .addr-item{padding:11px 15px;font-size:.95rem;cursor:pointer;border-top:1px solid var(--cream-2)}
+  .addr-item:first-child{border-top:none}
+  .addr-item:hover{background:var(--pane-soft)}
+  .addr-hint{font-size:.82rem;color:var(--blue-deep);font-weight:600;margin-top:7px;min-height:1.1em;text-align:center}
+
+  .wgroup{font-size:1.1rem;font-weight:700;letter-spacing:0;text-transform:none;color:var(--ink);margin:24px 0 12px;display:flex;align-items:center;justify-content:center;gap:.6rem}
+  .wgroup::before,.wgroup::after{content:"";height:2px;width:26px;background:var(--blue);border-radius:2px;opacity:.55}
+  .wgroup:first-child{margin-top:4px}
+  .wgrid{display:flex;flex-wrap:wrap;justify-content:center;gap:10px}
+  .wcard{position:relative;flex:0 1 150px;border:1px solid var(--line);border-radius:14px;background:#fff;padding:13px 10px 9px;text-align:center;transition:border .14s,box-shadow .14s}
+  .wcard.active{border-color:var(--blue);box-shadow:0 0 0 2px rgba(44,121,174,.18)}
+  .wcard-ic{height:38px;display:grid;place-items:center}
+  .wcard-ic svg{width:34px;height:34px}
+  .wcard-nm{font-weight:600;font-size:.86rem;line-height:1.2;margin-top:4px}
+  .wcard-pr{font-size:.74rem;color:var(--muted);margin-top:2px}
+  .wcard-step{display:flex;align-items:center;justify-content:center;gap:0;margin-top:9px;background:var(--cream);border:1px solid var(--line);border-radius:999px;padding:2px}
+  .wcard-step button{width:28px;height:28px;border:none;background:transparent;font-size:1.15rem;font-weight:700;color:var(--ink);cursor:pointer;border-radius:999px;line-height:1;display:grid;place-items:center}
+  .wcard-step button:hover{background:var(--pane-soft)}
+  .wcard-step .c{min-width:26px;font-family:"JetBrains Mono";font-weight:700;font-size:.95rem;font-variant-numeric:tabular-nums}
+
+  .seg{display:flex;gap:8px;flex-wrap:wrap}
+  .seg button{flex:1 1 auto;min-width:88px;padding:11px 12px;border-radius:12px;border:1px solid var(--line);background:var(--white);color:var(--ink-soft);font-family:"Hanken Grotesk";font-weight:600;font-size:.92rem;cursor:pointer;transition:all .14s ease;text-align:center}
+  .seg button .sub{display:block;font-size:.74rem;font-weight:500;color:var(--muted);margin-top:2px}
+  .seg button:hover{border-color:var(--blue)}
+  .seg button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+  .seg button[aria-pressed="true"] .sub{color:rgba(255,255,255,.72)}
+
+  .helper{margin:14px 0 8px;text-align:center}
+  .helper summary{cursor:pointer;font-size:.85rem;color:var(--blue-deep);font-weight:600;list-style:none}
+  .helper summary::-webkit-details-marker{display:none}
+  .helper summary::before{content:"＋ ";font-weight:700}
+  .helper[open] summary::before{content:"－ "}
+  .helper p{font-size:.88rem;color:var(--ink-soft);margin-top:8px;background:var(--cream);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+
+  .result{position:sticky;top:92px;background:var(--ink);color:#fff;border-radius:var(--radius);padding:28px 26px;overflow:hidden;box-shadow:var(--shadow);text-align:center}
+  .result::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(115deg,transparent 40%,rgba(255,255,255,.07) 50%,transparent 60%)}
+  .result .rlabel{font-size:.74rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.6)}
+  .price-stage{position:relative;margin:8px 0 4px;min-height:62px}
+  .price{font-family:"JetBrains Mono";font-weight:700;font-size:clamp(2.4rem,7vw,3.3rem);line-height:1;letter-spacing:-.02em}
+  .price .kr{font-size:1.3rem;color:var(--pane);margin-left:.2rem}
+  .price-stage.empty .price{color:rgba(255,255,255,.4);font-size:1.1rem;font-family:"Hanken Grotesk";font-weight:500}
+  .squeegee{position:absolute;top:-12px;bottom:-12px;width:46px;left:-60px;pointer-events:none;opacity:0}
+  .squeegee::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(156,192,218,0) 10%,rgba(255,255,255,.9) 50%,rgba(156,192,218,.4) 70%,transparent);filter:blur(.3px)}
+  .squeegee::after{content:"";position:absolute;top:0;bottom:0;right:14px;width:3px;background:var(--pane);box-shadow:0 0 14px 2px rgba(156,192,218,.8)}
+  @keyframes wipe{0%{left:-60px;opacity:0}8%{opacity:1}92%{opacity:1}100%{left:calc(100% + 30px);opacity:0}}
+  .price-stage.sweep .squeegee{animation:wipe .62s cubic-bezier(.5,0,.3,1)}
+  .price-stage.sweep .price{animation:clarify .62s ease}
+  @keyframes clarify{0%{filter:blur(7px);opacity:.4}55%{filter:blur(2px)}100%{filter:blur(0);opacity:1}}
+  .rrow{display:flex;justify-content:space-between;align-items:baseline;font-size:.92rem;padding:9px 0;border-top:1px solid rgba(255,255,255,.13)}
+  .rrow:first-of-type{border-top:none;margin-top:14px}
+  .rrow .v{font-family:"JetBrains Mono";font-weight:500;font-variant-numeric:tabular-nums}
+  .rrow.fradrag{color:var(--pane)}
+  .raddr{font-size:.82rem;color:rgba(255,255,255,.7);margin-top:12px}
+  .rnote{font-size:.78rem;color:rgba(255,255,255,.58);margin-top:12px;line-height:1.5}
+  .result .btn-primary{width:100%;margin-top:16px;background:var(--blue);color:#fff}
+  .result .btn-primary:hover{background:#3389c2}
+  .result .btn-primary[disabled]{opacity:.4;cursor:not-allowed;transform:none}
+
+  #tilbud{background:var(--cream-2)}
+  .form-card{background:var(--white);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow-sm);padding:30px;display:grid;grid-template-columns:1fr 1fr;gap:16px 18px}
+  .form-card .full{grid-column:1/-1}
+  .field label{display:block;font-size:.82rem;font-weight:600;color:var(--ink-soft);margin-bottom:6px}
+  .field input,.field select,.field textarea{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:11px;background:var(--cream);font-family:"Hanken Grotesk";font-size:1rem;color:var(--ink);transition:border .14s,background .14s}
+  .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--blue);background:#fff;box-shadow:0 0 0 3px rgba(44,121,174,.16)}
+  .field textarea{resize:vertical;min-height:78px}
+  .est-chip{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;background:var(--cream);border:1px dashed var(--blue);border-radius:12px;padding:12px 16px;font-size:.92rem}
+  .est-chip b{font-family:"JetBrains Mono";font-size:1.1rem}
+  .form-success{background:var(--white);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow-sm);padding:40px 30px;text-align:center}
+  .form-success .check{width:54px;height:54px;border-radius:50%;background:var(--blue);display:grid;place-items:center;margin:0 auto 16px}
+  .form-success h3{font-size:1.5rem}
+  @media(max-width:640px){.form-card{grid-template-columns:1fr;padding:22px}}
+
+  .trust{display:flex;flex-wrap:wrap;gap:14px;justify-content:center}
+  .trust .t{display:flex;align-items:center;gap:.55rem;background:var(--white);border:1px solid var(--line);border-radius:999px;padding:9px 16px;font-size:.9rem;font-weight:500;color:var(--ink-soft)}
+  .trust .t svg{width:18px;height:18px;color:var(--blue)}
+
+  .svc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  @media(max-width:820px){.svc-grid{grid-template-columns:1fr}}
+  .svc{background:var(--white);border:1px solid var(--line);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow-sm);text-align:center}
+  .svc .ic{width:42px;height:42px;border-radius:11px;background:var(--cream);border:1px solid var(--line);display:grid;place-items:center;margin:0 auto 14px}
+  .svc .ic svg{width:24px;height:24px;color:var(--blue)}
+  .svc h3{font-size:1.2rem}
+  .svc p{margin-top:8px;color:var(--ink-soft);font-size:.96rem}
+
+  footer{background:var(--ink);color:rgba(255,255,255,.78);padding:54px 0 30px}
+  footer .fgrid{display:flex;flex-wrap:wrap;gap:30px 56px;justify-content:center;align-items:flex-start;text-align:center}
+  footer .brand{color:#fff;justify-content:center}
+  footer .brand .mark{width:34px;height:34px;flex:0 0 34px;background:var(--mark) center/contain no-repeat;display:block}
+  footer a{color:rgba(255,255,255,.82);text-decoration:none}
+  footer a:hover{color:var(--pane)}
+  footer .col h4{font-family:"Hanken Grotesk";font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:10px}
+  footer .col p{font-size:.95rem;margin:4px 0}
+  .fbar{margin-top:36px;padding-top:18px;border-top:1px solid rgba(255,255,255,.13);font-size:.82rem;color:rgba(255,255,255,.5);display:flex;justify-content:center;flex-wrap:wrap;gap:8px 20px;text-align:center}
+
+  @media (prefers-reduced-motion: reduce){*{animation:none !important}html{scroll-behavior:auto}}
+
+  #catalogue{display:none}
+  .factstrip{background:var(--white);border-bottom:1px solid var(--line)}
+  .factstrip .wrap{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px 22px;padding:16px 24px;text-align:center}
+  .factstrip b{color:var(--ink)}
+  .factstrip .fchip{font-size:.95rem;color:var(--ink-soft)}
+  .factstrip a{color:var(--blue-deep);font-weight:600;text-decoration:none}
+  .subcta{display:flex;gap:.7rem;flex-wrap:wrap;justify-content:center;margin-top:18px}
+  .page-hero{background:radial-gradient(120% 90% at 88% -10%, rgba(156,192,218,.28), transparent 58%),linear-gradient(180deg,#F5F1E8 0%,#FBF9F4 100%);border-bottom:1px solid var(--line);text-align:center;padding:54px 0 44px}
+  .page-hero h1{font-size:clamp(2rem,4.4vw,3rem)}
+  .page-hero p{margin:.9rem auto 0;max-width:62ch;color:var(--ink-soft);font-size:1.1rem}
+  .breadcrumb{font-size:.84rem;color:var(--muted);margin-bottom:12px}
+  .breadcrumb a{color:var(--blue-deep);text-decoration:none}
+  .narrow{max-width:840px}
+  .ptable{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm)}
+  .ptable th,.ptable td{padding:12px 18px;border-top:1px solid var(--cream-2);font-size:.98rem}
+  .ptable thead th{background:var(--cream);font-size:.74rem;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-soft);text-align:left}
+  .ptable td.price,.ptable th.price{text-align:right;font-family:"JetBrains Mono";font-weight:700;white-space:nowrap}
+  .ptable tbody tr.grouprow td{background:var(--cream-2);font-weight:700;color:var(--ink);font-size:.92rem;letter-spacing:.02em}
+  .ptable td.name{font-weight:600}
+  .ptable td .hint{display:block;font-size:.8rem;color:var(--muted);font-weight:400}
+  .mods{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-top:18px;text-align:left}
+  .mod{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .mod b{display:block;font-size:.95rem}
+  .mod span{font-size:.88rem;color:var(--ink-soft)}
+  .faq-item{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin-bottom:12px;text-align:left;box-shadow:var(--shadow-sm)}
+  .faq-item h3{font-size:1.12rem;margin-bottom:6px}
+  .faq-item p{color:var(--ink-soft)}
+  .faq-item a{color:var(--blue-deep);font-weight:600;text-decoration:none}
+  .area-grid{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:8px}
+  .area-chip{background:#fff;border:1px solid var(--line);border-radius:999px;padding:9px 17px;font-weight:600;color:var(--ink-soft)}
+  .endcta{text-align:center;margin-top:40px}
+  .hero-min{margin-top:.8rem;font-size:.92rem;font-weight:600;color:var(--ink-soft);display:inline-flex;align-items:center;gap:.45rem}
+  .hero-min::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--blue)}
+  .min-notice{background:rgba(156,192,218,.14);border:1px solid rgba(156,192,218,.5);border-radius:12px;padding:12px 14px;margin-top:14px;font-size:.86rem;line-height:1.5;text-align:center}
+  .min-notice strong{display:block;color:var(--pane);font-size:.95rem;margin-bottom:3px}
+  .min-notice span{color:rgba(255,255,255,.82)}
+  .min-notice b{color:#fff;font-weight:700}
+  /* før & efter */
+  .ba-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:760px;margin:0 auto}
+  @media(max-width:560px){.ba-grid{grid-template-columns:1fr}}
+  .ba-card{position:relative;border-radius:var(--radius);overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow-sm);background:#fff}
+  .ba-card img{width:100%;height:340px;object-fit:cover;display:block}
+  .ba-tag{position:absolute;top:12px;left:12px;background:var(--ink);color:#fff;font-size:.74rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:5px 12px;border-radius:999px}
+  .ba-card.after .ba-tag{background:var(--blue)}
+  /* galleri */
+  .gal{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  @media(max-width:720px){.gal{grid-template-columns:1fr 1fr}.gal :last-child{grid-column:1/-1}}
+  .gal figure{margin:0;border-radius:var(--radius);overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow-sm);background:#fff}
+  .gal img{width:100%;height:230px;object-fit:cover;display:block}
+  .gal figcaption{font-size:.84rem;color:var(--ink-soft);padding:10px 14px;text-align:center}
+  /* anmeldelser */
+  .rev-rating{text-align:center;margin-bottom:26px}
+  .rev-stars{color:#F5A623;font-size:1.4rem;letter-spacing:2px}
+  .rev-rating p{color:var(--ink-soft);margin-top:4px;font-size:.98rem}
+  .rev-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media(max-width:820px){.rev-grid{grid-template-columns:1fr}}
+  .rev{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow-sm);text-align:left;display:flex;flex-direction:column}
+  .rev .stars{color:#F5A623;font-size:1rem;letter-spacing:1px;margin-bottom:8px}
+  .rev blockquote{margin:0;font-size:.98rem;color:var(--ink);line-height:1.55;flex:1}
+  .rev .who{margin-top:14px;font-weight:700;font-size:.92rem}
+  .rev .who span{font-weight:500;color:var(--muted)}
+
+  .q-wrap{max-width:760px;margin:0 auto}
+  .q-card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow-sm);padding:26px;margin-bottom:16px}
+  .q-item{display:flex;align-items:center;gap:14px;padding:12px 0;border-top:1px solid var(--cream-2)}
+  .q-item:first-of-type{border-top:none}
+  .q-ic{flex:0 0 52px;width:52px;height:52px;border-radius:12px;background:var(--cream);border:1px solid var(--line);display:grid;place-items:center}
+  .q-ic svg{width:32px;height:32px}
+  .q-meta{flex:1;min-width:0;text-align:left}
+  .q-meta .nm{font-weight:700}
+  .q-meta .sub{font-size:.85rem;color:var(--muted)}
+  .q-sum{font-family:"JetBrains Mono";font-weight:700;white-space:nowrap}
+  .q-row{display:flex;justify-content:space-between;padding:8px 0;font-size:.96rem;border-top:1px solid var(--cream-2)}
+  .q-row .v{font-family:"JetBrains Mono";font-variant-numeric:tabular-nums}
+  .q-total{background:var(--ink);color:#fff;border-radius:var(--radius);padding:22px 26px;text-align:center}
+  .q-total .lbl{font-size:.74rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.6);font-weight:700}
+  .q-total .amt{font-family:"JetBrains Mono";font-weight:700;font-size:2.6rem;line-height:1.1;margin-top:4px}
+  .q-total .net{color:var(--pane);font-size:.95rem;margin-top:4px}
+  .q-badge{display:inline-block;background:var(--pane-soft);color:var(--blue-deep);font-weight:700;font-size:.82rem;padding:5px 12px;border-radius:999px;margin:2px 3px}
+  .q-empty{text-align:center;color:var(--ink-soft)}
+</style>
+</head>
+<body>
+<header class="nav">
+  <div class="wrap nav-inner">
+    <a class="brand" href="index.html" style="text-decoration:none"><span class="mark" role="img" aria-label="ML Polering logo"></span> ML Polering</a>
+    <nav class="nav-links">
+      <a class="txt" href="index.html#beregner">Beregn pris</a>
+      <a class="txt" href="priser.html">Priser</a>
+      <a class="txt" href="faq.html">FAQ</a>
+      <a class="txt" href="omraader.html">Områder</a>
+      <a class="btn btn-call" href="tel:+4542708240">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 4h3l2 5-2.5 1.5a11 11 0 005 5L14 13l5 2v3a2 2 0 01-2 2A14 14 0 013 6a2 2 0 012-2z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+        42 70 82 40
+      </a>
+    </nav>
+  </div>
+</header>
+<section class="page-hero"><div class="wrap">
+  <div class="breadcrumb"><a href="index.html">Forside</a> / Kundens beregning</div>
+  <h1>Kundens prisberegning</h1>
+  <p>Sådan så kundens valg ud i prisberegneren. Kontaktoplysninger står i mailen.</p>
+</div></section>
+<section class="block"><div class="wrap q-wrap" id="qOut"></div></section>
+<footer>
+  <div class="wrap">
+    <div class="fgrid">
+      <div>
+        <div class="brand"><span class="mark" role="img" aria-label="ML Polering logo"></span> ML Polering</div>
+        <p style="margin:12px auto 0;max-width:32ch;font-size:.95rem">Vinduespudsning i København og omegn — for private og erhverv. v/ Morten Lindblad.</p>
+      </div>
+      <div class="col">
+        <h4>Kontakt</h4>
+        <p><a href="tel:+4542708240">42 70 82 40</a></p>
+        <p><a href="mailto:kontakt.mlpolering@gmail.com">kontakt.mlpolering@gmail.com</a></p>
+        <p>Lærkehegnet 161, 2670 Greve</p>
+      </div>
+      <div class="col">
+        <h4>Sider</h4>
+        <p><a href="index.html#beregner">Beregn pris</a></p>
+        <p><a href="priser.html">Priser</a></p>
+        <p><a href="faq.html">FAQ</a></p>
+        <p><a href="omraader.html">Områder</a></p>
+        <p>CVR 45801519</p>
+      </div>
+    </div>
+    <div class="fbar">
+      <span>© 2026 ML Polering</span>
+      <span>Designudkast — priser er pladsholdere og skal bekræftes.</span>
+    </div>
+  </div>
+</footer>
+<script>
+const S='stroke="#1B3A56" stroke-width="1.6" fill="none"', J='stroke-linejoin="round"';
+const ICONS = {
+  f1_klar:`<rect x="7" y="3" width="10" height="18" rx="1.5" ${S}/>`,
+  f1_2delt:`<rect x="7" y="3" width="10" height="18" rx="1.5" ${S}/><path d="M7 9h10" ${S}/>`,
+  f1_3delt:`<rect x="7" y="3" width="10" height="18" rx="1.5" ${S}/><path d="M7 8h10M7 13h10" ${S}/>`,
+  f1_kryds:`<rect x="7" y="3" width="10" height="18" rx="1.5" ${S}/><path d="M7 9h10M12 3v6M7 6h10" ${S}/>`,
+  f1_spros:`<rect x="7" y="3" width="10" height="18" rx="1.5" ${S}/><path d="M12 3v18M7 9h10M7 15h10" ${S}/>`,
+  f2_klar:`<rect x="4" y="4" width="16" height="16" rx="1.5" ${S}/><path d="M12 4v16" ${S}/>`,
+  f2_4delt:`<rect x="4" y="4" width="16" height="16" rx="1.5" ${S}/><path d="M12 4v16M4 12h16" ${S}/>`,
+  f2_6delt:`<rect x="4" y="4" width="16" height="16" rx="1.5" ${S}/><path d="M12 4v16M4 9.3h16M4 14.6h16" ${S}/>`,
+  f2_kryds:`<rect x="4" y="4" width="16" height="16" rx="1.5" ${S}/><path d="M12 4v16M4 9h16M8 4v5M16 4v5" ${S}/>`,
+  f2_spros:`<rect x="4" y="4" width="16" height="16" rx="1.5" ${S}/><path d="M12 4v16M8 4v16M16 4v16M4 9.3h16M4 14.6h16" ${S}/>`,
+  f3_klar:`<rect x="3" y="5" width="18" height="14" rx="1.5" ${S}/><path d="M9 5v14M15 5v14" ${S}/>`,
+  f3_delt:`<rect x="3" y="5" width="18" height="14" rx="1.5" ${S}/><path d="M9 5v14M15 5v14M3 12h18" ${S}/>`,
+  f3_kryds:`<rect x="3" y="5" width="18" height="14" rx="1.5" ${S}/><path d="M9 5v14M15 5v14M3 10h18M6 5v5M12 5v5M18 5v5" ${S}/>`,
+  f3_spros:`<rect x="3" y="5" width="18" height="14" rx="1.5" ${S}/><path d="M6 5v14M9 5v14M12 5v14M15 5v14M18 5v14M3 10h18M3 14.5h18" ${S}/>`,
+  parti:`<rect x="3" y="6" width="18" height="12" rx="1.5" ${S}/><path d="M16 6v12" ${S}/>`,
+  parti_delt:`<rect x="3" y="6" width="18" height="12" rx="1.5" ${S}/><path d="M3 14h18M9 14v4M15 14v4" ${S}/>`,
+  karnap:`<path d="M4 19v-7l3-3h10l3 3v7z" ${S} ${J}/><path d="M7 9v10M17 9v10" ${S}/>`,
+  tag:`<path d="M3 19l9-12 9 7v5z" ${S} ${J}/><path d="M9 13l7 4.5" ${S}/>`,
+  kaelder:`<path d="M3 8.5h18" ${S}/><rect x="5" y="10" width="14" height="7" rx="1.2" ${S}/><path d="M12 10v7" ${S}/>`,
+  doer_fuld:`<rect x="7" y="3" width="10" height="18" rx="1.5" ${S}/><circle cx="9.4" cy="12" r=".9" fill="#1B3A56"/>`,
+  doer_panel:`<rect x="7" y="3" width="10" height="18" rx="1.5" ${S}/><path d="M7 7h10M7 16h10" ${S}/><circle cx="9.4" cy="12" r=".9" fill="#1B3A56"/>`,
+  doer_smal:`<rect x="9" y="3" width="6" height="18" rx="1.5" ${S}/><circle cx="10.6" cy="12" r=".8" fill="#1B3A56"/>`,
+  doer_dobbelt:`<rect x="4" y="4" width="16" height="16" rx="1.5" ${S}/><path d="M12 4v16" ${S}/><circle cx="10.6" cy="12" r=".8" fill="#1B3A56"/><circle cx="13.4" cy="12" r=".8" fill="#1B3A56"/>`,
+  solcelle:`<rect x="3" y="6" width="18" height="11" rx="1" ${S}/><path d="M3 11h18M9 6v11M15 6v11" ${S}/><path d="M12 19v2" ${S}/>`,
+};
+const CAT={"f1_klar": ["1-fag, klar", "pr. vindue", 29, "f1_klar"], "f1_2delt": ["1-fag, 2-delt", "pr. vindue", 35, "f1_2delt"], "f1_3delt": ["1-fag, opdelt", "pr. vindue", 39, "f1_3delt"], "f1_kryds": ["1-fag, sprosset top", "pr. vindue", 45, "f1_kryds"], "f1_spros": ["1-fag, helsprosset", "pr. vindue", 55, "f1_spros"], "f2_klar": ["2-fag, klar", "pr. vindue", 45, "f2_klar"], "f2_4delt": ["2-fag, 4-delt", "pr. vindue", 55, "f2_4delt"], "f2_6delt": ["2-fag, 6-delt", "pr. vindue", 65, "f2_6delt"], "f2_kryds": ["2-fag, sprosset top", "pr. vindue", 69, "f2_kryds"], "f2_spros": ["2-fag, helsprosset", "pr. vindue", 85, "f2_spros"], "f3_klar": ["3-fag, klar", "pr. vindue", 65, "f3_klar"], "f3_delt": ["3-fag, opdelt", "pr. vindue", 79, "f3_delt"], "f3_kryds": ["3-fag, sprosset top", "pr. vindue", 89, "f3_kryds"], "f3_spros": ["3-fag, helsprosset", "pr. vindue", 105, "f3_spros"], "parti": ["Panorama / glasparti", "pr. parti", 65, "parti"], "parti_delt": ["Parti m. underruder", "pr. parti", 75, "parti_delt"], "karnap": ["Karnap", "pr. karnap", 89, "karnap"], "tag": ["Tagvindue (VELUX)", "pr. stk.", 45, "tag"], "kaelder": ["Kældervindue", "pr. vindue", 19, "kaelder"], "doer_fuld": ["Terrassedør, fuldglas", "pr. dør", 49, "doer_fuld"], "doer_panel": ["Dør m. panel/sprosse", "pr. dør", 45, "doer_panel"], "doer_smal": ["Smal / sidehængt dør", "pr. dør", 39, "doer_smal"], "doer_dobbelt": ["Dobbelt terrassedør", "pr. dør", 79, "doer_dobbelt"], "solcelle": ["Solcellepanel", "pr. panel", 25, "solcelle"]};
+const MOD={side:{'ude':1,'inde':1.5,'begge':1.8},access:{'let':0,'etage':100,'svaer':150},
+  interval:{'engang':0,'u12':40,'u8':40,'u4':70},
+  intervalLabel:{'engang':'Engangsbesøg','u12':'Hver 12. uge','u8':'Hver 8. uge','u4':'Hver 4. uge'},
+  minVisit:225,fradragFactor:0.74,roundTo:5};
+const kr=n=>n.toLocaleString('da-DK');
+const R=(n,s)=>Math.round(n/s)*s;
+const P=new URLSearchParams(location.search);
+const out=document.getElementById('qOut');
+const raw=(P.get('v')||'').trim();
+if(!raw){ out.innerHTML='<div class="q-card q-empty"><h3>Ingen beregning i linket</h3><p style="margin-top:8px">Kunden har sendt en forespørgsel uden at bruge prisberegneren.</p></div>'; }
+else {
+  const side=P.get('s')||'ude', access=P.get('a')||'let', iv=P.get('i')||'u12';
+  const sideLabel={ude:'Udvendig',inde:'Indvendig',begge:'Både ude og inde'}[side]||'Udvendig';
+  const accessLabel={let:'Stueplan',etage:'I højden (1.-3. sal)',svaer:'Svært tilgængeligt'}[access]||'Stueplan';
+  let base=0, rows='';
+  raw.split(',').forEach(p=>{
+    const [id,q]=p.split(':'); const n=parseInt(q,10)||0; const w=CAT[id];
+    if(!w||!n) return;
+    const [nm,hint,price,icon]=w; const sum=n*price; base+=sum;
+    rows+=`<div class="q-item"><div class="q-ic"><svg viewBox="0 0 24 24">${ICONS[icon]||''}</svg></div>
+      <div class="q-meta"><div class="nm">${n}× ${nm}</div><div class="sub">${price} kr./stk. · ${hint}</div></div>
+      <div class="q-sum">${kr(sum)} kr.</div></div>`;
+  });
+  const till=(side==='inde')?0:MOD.access[access];
+  const gross=R(base*MOD.side[side]+till,MOD.roundTo);
+  const rabat=(gross>=MOD.minVisit)?MOD.interval[iv]:0;
+  let beregnet=Math.max(R(gross-rabat,MOD.roundTo),0);
+  const total=Math.max(beregnet,MOD.minVisit);
+  const net=R(total*MOD.fradragFactor,MOD.roundTo);
+  let ex='';
+  ex+=`<div class="q-row"><span>Vinduer i alt</span><span class="v">${kr(base)} kr.</span></div>`;
+  if(side!=='ude') ex+=`<div class="q-row"><span>Tillæg — ${sideLabel.toLowerCase()}</span><span class="v">${side==='inde'?'+50 %':'+80 %'}</span></div>`;
+  if(till>0) ex+=`<div class="q-row"><span>Tillæg — ${accessLabel.toLowerCase()}</span><span class="v">+${kr(till)} kr.</span></div>`;
+  if(rabat>0) ex+=`<div class="q-row"><span>Rabat — ${MOD.intervalLabel[iv]}</span><span class="v">−${kr(rabat)} kr.</span></div>`;
+  if(beregnet<MOD.minVisit) ex+=`<div class="q-row"><span>Beregnet ${kr(beregnet)} kr. → mindstepris</span><span class="v">225 kr.</span></div>`;
+  out.innerHTML=`
+    <div class="q-card">
+      <div style="text-align:center;margin-bottom:8px">
+        <span class="q-badge">${sideLabel}</span><span class="q-badge">${accessLabel}</span><span class="q-badge">${MOD.intervalLabel[iv]}</span>
+      </div>
+      ${rows}
+      <div style="margin-top:10px">${ex}</div>
+    </div>
+    <div class="q-total">
+      <div class="lbl">Estimat pr. besøg</div>
+      <div class="amt">${kr(total)} kr.</div>
+      <div class="net">Efter servicefradrag: ca. ${kr(net)} kr.</div>
+    </div>`;
+}
+</script>
+</body>
+</html>
